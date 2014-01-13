@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import org.apache.http.HttpEntity;
@@ -24,12 +25,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
@@ -45,9 +48,13 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 	private AutoCompleteTextView fromTextView, toTextView;
 	private ArrayList<HashMap<String, String>> resultsList = new ArrayList<HashMap<String, String>>();
 
+	private ResultsAdapter resultsListAdapter = null;
+
 	private LocationManager locManager = null;
 	private Location currentLoc = null;
 	private int locUpdatesReceived = 0;
+
+	private long secsToStation = 0;
 
 	class GetTravelTimes extends AsyncTask<String, Void, String> {
 
@@ -101,7 +108,9 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 
 				Log.v("Text: ", distance.getString("text"));
 				Log.v("Value:", distance.getString("value"));
+
 				timeValue = distance.getString("text");
+				secsToStation = Integer.parseInt(distance.getString("value"));
 			} catch (Exception e) { Log.e("Exception!", e.toString()); }
 
 			return timeValue;
@@ -155,9 +164,6 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 				for (int i=0; i<trainArray.length(); i++) {
 					JSONObject train = (JSONObject)trainArray.get(i);
 
-					Log.v("Train: ", train.getString("orig_line"));
-					Log.v("Departure Time:", train.getString("orig_departure_time"));
-
 					resultsMap = new HashMap<String, String>();
 					resultsMap.put("train", train.getString("orig_line"));
 					resultsMap.put("departure time", train.getString("orig_departure_time"));
@@ -169,6 +175,58 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 		}
 
 		protected void onPostExecute(String result) { }
+	}
+
+	public class ResultsAdapter extends SimpleAdapter {
+		public ResultsAdapter(Context context, ArrayList list, int id, String keys[], int ids[]) {
+			super(context, list, id, keys, ids);
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			LinearLayout layout = (LinearLayout) super.getView(position, convertView, parent);
+
+			/* To figure out if we'll make the train, get current secs since midnight, plus how
+			 * long Google says it'll take to get to the train.  Subtract from that secs since midnight
+			 * that the train will depart at, and there you go.
+			 */
+
+			Calendar cal = Calendar.getInstance();
+			long now = cal.getTimeInMillis();
+			cal.set(Calendar.HOUR_OF_DAY, 0);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
+			long secsToSpare = getSecsToDeparture(((TextView)(layout.getChildAt(1))).getText().toString())
+					- (((now - cal.getTimeInMillis())/1000) + secsToStation);
+
+			if (secsToSpare < 2*60) {			// Under 2 minutes to spare, good chance of missing train
+				((TextView)(layout.getChildAt(0))).setTextColor(getResources().getColor(R.color.lowChanceColor));
+				((TextView)(layout.getChildAt(1))).setTextColor(getResources().getColor(R.color.lowChanceColor));
+			} else if (secsToSpare < 10*60) {	// More than 2, but less than 7 minutes to spare - probably make it...
+				((TextView)(layout.getChildAt(0))).setTextColor(getResources().getColor(R.color.medChanceColor));
+				((TextView)(layout.getChildAt(1))).setTextColor(getResources().getColor(R.color.medChanceColor));
+			} else {							// More than 7 minutes, pretty safe
+				((TextView)(layout.getChildAt(0))).setTextColor(getResources().getColor(R.color.highChanceColor));
+				((TextView)(layout.getChildAt(1))).setTextColor(getResources().getColor(R.color.highChanceColor));
+			}
+
+			return layout;
+		}
+
+		private	long getSecsToDeparture(String time) {
+			long secs = 0;
+
+			time = time.trim();
+			String splitTime[] = time.split(":|[AP]");	// Split time into hours and minutes
+
+			secs = 3600*Integer.parseInt(splitTime[0]);	// Hours
+			if (time.charAt(time.length()-2) == 'P' && Integer.parseInt(splitTime[0]) != 12)
+				secs += 12*3600;						// PM, add seconds for 12 hours
+			secs += 60*Integer.parseInt(splitTime[1]);	// Minutes
+
+			return secs;
+		}
 	}
 
 	@Override
@@ -200,7 +258,7 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 		fromTextView.requestFocus();
 
 		ListView resultsListView = (ListView)findViewById(R.id.resultsListView);
-		final SimpleAdapter resultsListAdapter = new SimpleAdapter(this, resultsList, R.layout.results_row,
+		resultsListAdapter = new ResultsAdapter(this, resultsList, R.layout.results_row,
 				new String[] {"train", "departure time"}, new int [] {R.id.rowTrainName, R.id.rowDepartureTime});
 		resultsListView.setAdapter(resultsListAdapter);
 
@@ -253,6 +311,9 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 				TextView transportationTime = (TextView)findViewById(R.id.transportationTime);
 				transportationTime.setText(new GetTravelTimes().execute(stationsMap.get(fromTextView.getText().toString())).get());
 			} catch (Exception e) { Log.e("Exception", e.toString()); }
+
+			if (resultsListAdapter != null)
+				resultsListAdapter.notifyDataSetChanged();
 		}
 	}
 

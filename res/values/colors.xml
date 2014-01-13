@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="lowChanceColor">#F01111</color>
+    <color name="medChanceColor">#F0F01F</color>
+    <color name="highChanceColor">#32B800</color>
+    
+</resources>
