@@ -3,8 +3,8 @@ package com.example.septanexttoarrive;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URLEncoder;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -25,14 +25,16 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 public class MainActivity extends Activity {
 	
-	class GetNetworkTask extends AsyncTask<String, Void, String> {
-		protected String doInBackground(String... stations) {
+	class GetNetworkTask extends AsyncTask<String, Void, ArrayList<String>> {
+		protected ArrayList<String> doInBackground(String... stations) {
+			ArrayList resultsList = new ArrayList<String>();
+
 			DefaultHttpClient httpClient = new DefaultHttpClient(new BasicHttpParams());
 			HttpGet httpGet = null;
 			InputStream inputStream = null;
@@ -73,16 +75,18 @@ public class MainActivity extends Activity {
 					JSONObject train = (JSONObject)trainArray.get(i);
 					Log.v("Train: ", train.getString("orig_line"));
 					Log.v("Departure Time:", train.getString("orig_departure_time"));
+					resultsList.add(train.getString("orig_line") + " " + train.getString("orig_departure_time"));
 				}
 			} catch (Exception e) { Log.e("Exception!", e.toString()); }
 			
-			return result;
+			return resultsList;
 		}
 		
 		protected void onPostExecute(String result) { }
 	}
 
 	AutoCompleteTextView fromTextView, toTextView;
+	ArrayList<String> resultsList = new ArrayList<String>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -102,12 +106,21 @@ public class MainActivity extends Activity {
 		
 		fromTextView.requestFocus();
 		
+		ListView resultsListView = (ListView)findViewById(R.id.resultsListView);
+		final ArrayAdapter<String> resultsListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, resultsList);
+		resultsListView.setAdapter(resultsListAdapter);
+
 		toTextView.setOnEditorActionListener(new OnEditorActionListener() {
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				boolean handled = false;
 				
 				if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-					new GetNetworkTask().execute(fromTextView.getText().toString(), toTextView.getText().toString());
+					resultsList.clear();
+					try {
+						resultsList.addAll(new GetNetworkTask().execute(fromTextView.getText().toString(), toTextView.getText().toString()).get());
+					} catch (Exception e) { Log.e("Exception!", e.toString()); }
+					resultsListAdapter.notifyDataSetChanged();
+
 					InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 					imm.hideSoftInputFromWindow(toTextView.getWindowToken(), 0);
 					handled = true;

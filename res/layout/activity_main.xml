@@ -55,4 +55,13 @@
         android:imeOptions="actionNext"
         android:inputType="text" />
 
+    <ListView
+        android:id="@+id/resultsListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/toTextField"
+        android:layout_marginTop="19dp" >
+    </ListView>
+
 </RelativeLayout>
