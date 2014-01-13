@@ -183,19 +183,7 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 		public View getView(int position, View convertView, ViewGroup parent) {
 			LinearLayout layout = (LinearLayout) super.getView(position, convertView, parent);
 
-			/* To figure out if we'll make the train, get current secs since midnight, plus how
-			 * long Google says it'll take to get to the train.  Subtract from that secs since midnight
-			 * that the train will depart at, and there you go.
-			 */
-
-			Calendar cal = Calendar.getInstance();
-			long now = cal.getTimeInMillis();
-			cal.set(Calendar.HOUR_OF_DAY, 0);
-			cal.set(Calendar.MINUTE, 0);
-			cal.set(Calendar.SECOND, 0);
-			cal.set(Calendar.MILLISECOND, 0);
-			long secsToSpare = getSecsToDeparture(((TextView)(layout.getChildAt(1))).getText().toString())
-					- (((now - cal.getTimeInMillis())/1000) + secsToStation);
+			long secsToSpare = getSecsToSpare(((TextView)(layout.getChildAt(1))).getText().toString());
 
 			if (secsToSpare < 2*60) {			// Under 2 minutes to spare, good chance of missing train
 				((TextView)(layout.getChildAt(0))).setTextColor(getResources().getColor(R.color.lowChanceColor));
@@ -211,9 +199,10 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 			return layout;
 		}
 
-		private	long getSecsToDeparture(String time) {
+		private	long getSecsToSpare(String time) {
 			long secs = 0;
 
+			/* Get departure time of train, in secs since midnight */
 			time = time.trim();
 			String splitTime[] = time.split(":|[AP]");	// Split time into hours and minutes
 
@@ -222,7 +211,19 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 				secs += 12*3600;						// PM, add seconds for 12 hours
 			secs += 60*Integer.parseInt(splitTime[1]);	// Minutes
 
-			return secs;
+			/* To figure out if we'll make the train, get current secs since midnight, plus how
+			 * long Google says it'll take to get to the train.  Subtract from that secs since midnight
+			 * that the train will depart at, and there you go.
+			 */
+
+			Calendar cal = Calendar.getInstance();
+			long now = cal.getTimeInMillis();
+			cal.set(Calendar.HOUR_OF_DAY, 0);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.SECOND, 0);
+			cal.set(Calendar.MILLISECOND, 0);
+
+			return (secs - (((now - cal.getTimeInMillis())/1000) + secsToStation));
 		}
 	}
 
