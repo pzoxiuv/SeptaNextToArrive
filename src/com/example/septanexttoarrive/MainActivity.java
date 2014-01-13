@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
+import java.util.HashMap;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -26,14 +26,16 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 public class MainActivity extends Activity {
 	
-	class GetNetworkTask extends AsyncTask<String, Void, ArrayList<String>> {
-		protected ArrayList<String> doInBackground(String... stations) {
-			ArrayList resultsList = new ArrayList<String>();
+	class GetNetworkTask extends AsyncTask<String, Void, ArrayList<HashMap<String, String>>> {
+		protected ArrayList<HashMap<String, String>> doInBackground(String... stations) {
+			ArrayList<HashMap<String, String>> resultsList = new ArrayList<HashMap<String, String>>();
+			HashMap<String, String> resultsMap;
 
 			DefaultHttpClient httpClient = new DefaultHttpClient(new BasicHttpParams());
 			HttpGet httpGet = null;
@@ -73,9 +75,14 @@ public class MainActivity extends Activity {
 				trainArray = new JSONArray(result);
 				for (int i=0; i<trainArray.length(); i++) {
 					JSONObject train = (JSONObject)trainArray.get(i);
+
 					Log.v("Train: ", train.getString("orig_line"));
 					Log.v("Departure Time:", train.getString("orig_departure_time"));
-					resultsList.add(train.getString("orig_line") + " " + train.getString("orig_departure_time"));
+
+					resultsMap = new HashMap<String, String>();
+					resultsMap.put("train", train.getString("orig_line"));
+					resultsMap.put("departure time", train.getString("orig_departure_time"));
+					resultsList.add(resultsMap);
 				}
 			} catch (Exception e) { Log.e("Exception!", e.toString()); }
 			
@@ -86,7 +93,7 @@ public class MainActivity extends Activity {
 	}
 
 	AutoCompleteTextView fromTextView, toTextView;
-	ArrayList<String> resultsList = new ArrayList<String>();
+	ArrayList<HashMap<String, String>> resultsList = new ArrayList<HashMap<String, String>>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +114,8 @@ public class MainActivity extends Activity {
 		fromTextView.requestFocus();
 		
 		ListView resultsListView = (ListView)findViewById(R.id.resultsListView);
-		final ArrayAdapter<String> resultsListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, resultsList);
+		final SimpleAdapter resultsListAdapter = new SimpleAdapter(this, resultsList, R.layout.results_row,
+				new String[] {"train", "departure time"}, new int [] {R.id.rowTrainName, R.id.rowDepartureTime});
 		resultsListView.setAdapter(resultsListAdapter);
 
 		toTextView.setOnEditorActionListener(new OnEditorActionListener() {
