@@ -1,0 +1,153 @@
+<item>30th Street Station</item>
+<item>49th Street</item>
+<item>Airport Terminal A</item>
+<item>Airport Terminal B</item>
+<item>Airport Terminals C & D</item>
+<item>Airport Terminals E & F</item>
+<item>Allen Lane</item>
+<item>Ambler</item>
+<item>Angora</item>
+<item>Ardmore</item>
+<item>Ardsley</item>
+<item>Bala</item>
+<item>Berwyn</item>
+<item>Bethayres</item>
+<item>Bridesburg</item>
+<item>Bristol</item>
+<item>Carpenter</item>
+<item>Chalfont</item>
+<item>Chelten Avenue</item>
+<item>Cheltenham</item>
+<item>Chester Transportation Center</item>
+<item>Chestnut Hill East</item>
+<item>Chestnut Hill West</item>
+<item>Churchmans Crossing</item>
+<item>Claymont</item>
+<item>Clifton–Aldan</item>
+<item>Colmar</item>
+<item>Conshohocken</item>
+<item>Cornwells Heights</item>
+<item>Crestmont</item>
+<item>Croydon</item>
+<item>Crum Lynne</item>
+<item>Curtis Park</item>
+<item>Cynwyd</item>
+<item>Darby</item>
+<item>Daylesford</item>
+<item>Delaware Valley College</item>
+<item>Devon</item>
+<item>Downingtown</item>
+<item>Doylestown</item>
+<item>East Falls</item>
+<item>Eastwick</item>
+<item>Eddington</item>
+<item>Eddystone</item>
+<item>Elkins Park</item>
+<item>Elm Street, Norristown</item>
+<item>Elwyn</item>
+<item>Exton</item>
+<item>Fern Rock Transportation Center</item>
+<item>Fernwood–Yeadon</item>
+<item>Folcroft</item>
+<item>Forest Hills</item>
+<item>Fort Washington</item>
+<item>Fortuna</item>
+<item>Fox Chase</item>
+<item>Germantown</item>
+<item>Gladstone</item>
+<item>Glenolden</item>
+<item>Glenside</item>
+<item>Gravers</item>
+<item>Gwynedd Valley</item>
+<item>Hatboro</item>
+<item>Haverford</item>
+<item>Highland</item>
+<item>Highland Avenue</item>
+<item>Holmesburg Junction</item>
+<item>Ivy Ridge</item>
+<item>Jenkintown–Wyncote</item>
+<item>Langhorne</item>
+<item>Lansdale</item>
+<item>Lansdowne</item>
+<item>Lawndale</item>
+<item>Levittown</item>
+<item>Link Belt</item>
+<item>Main Street, Norristown</item>
+<item>Malvern</item>
+<item>Manayunk</item>
+<item>Marcus Hook</item>
+<item>Market East Station</item>
+<item>Meadowbrook</item>
+<item>Media</item>
+<item>Melrose Park</item>
+<item>Merion</item>
+<item>Miquon</item>
+<item>Morton</item>
+<item>Mount Airy</item>
+<item>Moylan – Rose Valley</item>
+<item>Narberth</item>
+<item>Neshaminy Falls</item>
+<item>New Britain</item>
+<item>Newark Rail Station</item>
+<item>Newark, Delaware</item>
+<item>Noble</item>
+<item>Norristown Transportation Center</item>
+<item>North Broad</item>
+<item>North Hills</item>
+<item>North Philadelphia</item>
+<item>North Wales</item>
+<item>North Hills</item>
+<item>Norwood</item>
+<item>Oreland</item>
+<item>Overbrook</item>
+<item>Paoli</item>
+<item>Penllyn</item>
+<item>Pennbrook</item>
+<item>Philmont</item>
+<item>Primos</item>
+<item>Prospect Park</item>
+<item>Queen Lane</item>
+<item>Radnor</item>
+<item>Ridley Park</item>
+<item>Rosemont</item>
+<item>Roslyn</item>
+<item>Rydal</item>
+<item>Ryers</item>
+<item>Secane</item>
+<item>Sedgwick</item>
+<item>Sharon Hill</item>
+<item>Somerton</item>
+<item>Spring Mill</item>
+<item>St. Davids</item>
+<item>St. Martins</item>
+<item>Stenton</item>
+<item>Strafford</item>
+<item>Suburban Station</item>
+<item>Swarthmore</item>
+<item>Tacony</item>
+<item>Temple University</item>
+<item>Thorndale</item>
+<item>Torresdale</item>
+<item>Trenton Transit Center</item>
+<item>Trevose</item>
+<item>Tulpehocken</item>
+<item>University City</item>
+<item>Upsal</item>
+<item>Villanova</item>
+<item>Wallingford</item>
+<item>Warminster</item>
+<item>Washington Lane</item>
+<item>Awbury Arboretum</item>
+<item>Wayne</item>
+<item>Wayne Junction</item>
+<item>West Trenton</item>
+<item>Whitford</item>
+<item>Willow Grove</item>
+<item>Wilmington Station</item>
+<item>Wissahickon</item>
+<item>Wister</item>
+<item>Woodbourne</item>
+<item>Wyndmoor</item>
+<item>Wynnefield Avenue</item>
+<item>Wynnewood</item>
+<item>Yardley</item>
