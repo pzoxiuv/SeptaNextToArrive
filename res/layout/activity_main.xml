@@ -60,8 +60,33 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/toTextField"
-        android:layout_marginTop="19dp" >
+        android:layout_alignTop="@+id/tableRow1" >
+
     </ListView>
+
+    <Spinner
+        android:id="@+id/transportationMethod"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toTextField"
+        android:layout_toRightOf="@+id/transportationTimeLabel" />
+
+    <TextView
+        android:id="@+id/transportationTimeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/resultsListView"
+        android:layout_alignTop="@+id/transportationMethod"
+        android:layout_marginTop="10dp"
+        android:text="Time to station if " />
+
+    <TextView
+        android:id="@+id/transportationTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/transportationTimeLabel"
+        android:layout_alignBottom="@+id/transportationTimeLabel"
+        android:layout_toRightOf="@+id/transportationMethod"
+        android:text="" />
 
 </RelativeLayout>
