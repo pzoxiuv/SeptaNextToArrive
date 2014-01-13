@@ -106,9 +106,6 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 				JSONObject leg = (JSONObject)legsArray.get(0);	// Assume just one leg
 				JSONObject distance = leg.getJSONObject("duration");
 
-				Log.v("Text: ", distance.getString("text"));
-				Log.v("Value:", distance.getString("value"));
-
 				timeValue = distance.getString("text");
 				secsToStation = Integer.parseInt(distance.getString("value"));
 			} catch (Exception e) { Log.e("Exception!", e.toString()); }
@@ -279,7 +276,7 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 					resultsListAdapter.notifyDataSetChanged();
 
 					InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-					imm.hideSoftInputFromWindow(toTextView.getWindowToken(), 0);
+					imm.hideSoftInputFromWindow(toTextView.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
 					handled = true;
 				}
 
