@@ -42,21 +42,23 @@ import android.widget.TextView.OnEditorActionListener;
 
 public class MainActivity extends Activity implements LocationListener, OnItemSelectedListener {
 
-	private String transportationMethod = "walking";
+	private String transportationMethod = "walking";	// Either walking or driving
 
-	HashMap<String, String> stationsMap = null;
+	HashMap<String, String> stationsMap = null;			// HashMap, keys=station name values=latitude,longitude coordinates of station
 
-	private AutoCompleteTextView fromTextView, toTextView;
+	/* List of results.  Each result is stored in a HashMap, with the keys "train" (for train name) and "departure time". */
 	private ArrayList<HashMap<String, String>> resultsList = new ArrayList<HashMap<String, String>>();
-
+	private AutoCompleteTextView fromTextView, toTextView;
 	private ResultsAdapter resultsListAdapter = null;
 
 	private LocationManager locManager = null;
 	private Location currentLoc = null;
-	private int locUpdatesReceived = 0;
+	private int locUpdatesReceived = 0;	// We only need enough location updates to get a fairly accurate reading of where we are,
+										// so keep track of how many updates we get and stop keeping track after a few
 
-	private long secsToStation = 0;
+	private long secsToStation = 0;		// How many seconds Google Maps says we are from the station
 
+	/* AsyncTask for querying Google Maps and getting how many seconds it'll take to get from our current location to the starting station */
 	class GetTravelTimes extends AsyncTask<String, Void, String> {
 
 		protected String doInBackground(String... destination) {
@@ -100,11 +102,12 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 			String timeValue = null;
 
 			try {
+				/* See <Google Maps API url> for sample results */
 				directionsObject = new JSONObject(result);
 				JSONArray routesArray = directionsObject.getJSONArray("routes");
-				JSONObject route = (JSONObject)routesArray.get(0);	// Only interested in first result
+				JSONObject route = (JSONObject)routesArray.get(0);	// Assume first route is the one taken (should be approx. same time anyway)
 				JSONArray legsArray = route.getJSONArray("legs");
-				JSONObject leg = (JSONObject)legsArray.get(0);	// Assume just one leg
+				JSONObject leg = (JSONObject)legsArray.get(0);		// Assume just one leg in the trip
 				JSONObject distance = leg.getJSONObject("duration");
 
 				timeValue = distance.getString("text");
@@ -117,6 +120,7 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 		protected void onPostExecute(String result) { }
 	}
 
+	/* AsyncTask for querying SEPTA to get NextToArrive data */
 	class GetTrainTimes extends AsyncTask<String, Void, ArrayList<HashMap<String, String>>> {
 
 		protected ArrayList<HashMap<String, String>> doInBackground(String... stations) {
@@ -158,10 +162,10 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 			JSONArray trainArray = null;
 
 			try {
+				/* See e.g. www3.septa.org/hackathon/NextToArrive/Doylestown/Suburban%20Station/10 for sample results */
 				trainArray = new JSONArray(result);
 				for (int i=0; i<trainArray.length(); i++) {
 					JSONObject train = (JSONObject)trainArray.get(i);
-
 					resultsMap = new HashMap<String, String>();
 					resultsMap.put("train", train.getString("orig_line"));
 					resultsMap.put("departure time", train.getString("orig_departure_time"));
@@ -175,6 +179,10 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 		protected void onPostExecute(String result) { }
 	}
 
+	/* ResultsAdapter for ListView of results.  Only difference from SimpleAdapter is ResultsAdapter
+	 * prints the results in different colors based on the likelihood the user can make it to the
+	 * station in time.
+	 */
 	public class ResultsAdapter extends SimpleAdapter {
 		public ResultsAdapter(Context context, ArrayList list, int id, String keys[], int ids[]) {
 			super(context, list, id, keys, ids);
@@ -200,20 +208,22 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 			return layout;
 		}
 
+		/* Calculates with how many seconds to spare the user will have when they arrive at the station.  The time parameter
+		 * is what time the train departs the station.
+		 */
 		private	long getSecsToSpare(String time) {
 			long secs = 0;
 
 			/* Get departure time of train, in secs since midnight */
 			time = time.trim();
-			String splitTime[] = time.split(":|[AP]");	// Split time into hours and minutes
-
+			String splitTime[] = time.split(":|[AP]");	// Split time into hours and minutes. Time format is HH:MM[A|P]M
 			secs = 3600*Integer.parseInt(splitTime[0]);	// Hours
 			if (time.charAt(time.length()-2) == 'P' && Integer.parseInt(splitTime[0]) != 12)
-				secs += 12*3600;						// PM, add seconds for 12 hours
+				secs += 12*3600;						// PM, add seconds for first 12 hours of the day
 			secs += 60*Integer.parseInt(splitTime[1]);	// Minutes
 
-			/* To figure out if we'll make the train, get current secs since midnight, plus how
-			 * long Google says it'll take to get to the train.  Subtract from that secs since midnight
+			/* To figure out seconds to spare, get current seconds since midnight, and add how
+			 * long Google says it'll take to get to the station.  Subtract from that secs since midnight
 			 * that the train will depart at, and there you go.
 			 */
 
@@ -247,6 +257,7 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 		toTextView = (AutoCompleteTextView) findViewById(R.id.toTextField);
 
 		loadStationsMap();
+		/* For autocomplete in the to/from station text fields */
 		ArrayAdapter<String> stationsAdapter = 
 				new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
 				stationsMap.keySet().toArray(new String[stationsMap.keySet().size()]));
@@ -277,6 +288,7 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 					} catch (Exception e) { Log.e("Exception!", e.toString()); }
 					resultsListAdapter.notifyDataSetChanged();
 
+					/* Make sure the keyboard goes away after displaying results */
 					InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 					imm.hideSoftInputFromWindow(toTextView.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
 					handled = true;
@@ -287,6 +299,9 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 		});
 	}
 
+	/* Splits each String in the stations_name string-array into it's two parts, the station name and the station coordinates,
+	 * and fills the stationsMap HashMap with them.
+	 */
 	private void loadStationsMap() {
 		stationsMap = new HashMap<String, String>();
 
@@ -296,6 +311,7 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 		}
 	}
 
+	/* Called when user presses the refresh button on the Action Bar, basically re-get everything and update results */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.action_refresh) {
@@ -326,19 +342,23 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 		return true;
 	}
 
+	/* Transportation method spinner changed */
 	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 		transportationMethod = (String)parent.getItemAtPosition(pos);
 		if (fromTextView.getText().toString().trim().length() != 0) {
 			try {
+				/* Get new directions from Google and update the label with how long it'll take now to get to the station */
 				TextView transportationTime = (TextView)findViewById(R.id.transportationTime);
 				transportationTime.setText(new GetTravelTimes().execute(stationsMap.get(fromTextView.getText().toString())).get());
 			} catch (Exception e) { Log.e("Exception", e.toString()); }
 
+			/* If there are results displayed already, redraw them so the colors reflect the current travel time to the station */
 			if (resultsListAdapter != null)
 				resultsListAdapter.notifyDataSetChanged();
 		}
 	}
 
+	/* If somehow there's nothing selected by the spinner, default to walking to the station */
 	public void onNothingSelected(AdapterView<?> parent) {
 		transportationMethod = "walking";
 	}
@@ -346,7 +366,7 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 	public void onLocationChanged(Location location) {
 		currentLoc = location;
 		locUpdatesReceived++;
-		if (locUpdatesReceived > 3) {
+		if (locUpdatesReceived > 3) {	// Assume that after a few updates, we have a pretty good location
 			locManager.removeUpdates(this);
 		}
 	}
