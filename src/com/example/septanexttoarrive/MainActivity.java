@@ -24,6 +24,7 @@ import android.content.Context;
 import android.util.Log;
 import android.view.Menu;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -293,6 +294,29 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 		for (String s : combinedNameCoor) {
 			stationsMap.put(s.split("\\|")[0], s.split("\\|")[1]);
 		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == R.id.action_refresh) {
+			try {
+				TextView transportationTime = (TextView)findViewById(R.id.transportationTime);
+				transportationTime.setText(new GetTravelTimes().execute(stationsMap.get(fromTextView.getText().toString())).get());
+			} catch (Exception e) { Log.e("Exception", e.toString()); }
+
+			resultsList.clear();
+			try {
+				resultsList.addAll(new GetTrainTimes().execute(fromTextView.getText().toString(), toTextView.getText().toString()).get());
+			} catch (Exception e) { Log.e("Exception!", e.toString()); }
+			resultsListAdapter.notifyDataSetChanged();
+
+			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(toTextView.getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
+
+			return true;
+		}
+
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
