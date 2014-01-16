@@ -214,14 +214,6 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 		private	long getSecsToSpare(String time) {
 			long secs = 0;
 
-			/* Get departure time of train, in secs since midnight */
-			time = time.trim();
-			String splitTime[] = time.split(":|[AP]");	// Split time into hours and minutes. Time format is HH:MM[A|P]M
-			secs = 3600*Integer.parseInt(splitTime[0]);	// Hours
-			if (time.charAt(time.length()-2) == 'P' && Integer.parseInt(splitTime[0]) != 12)
-				secs += 12*3600;						// PM, add seconds for first 12 hours of the day
-			secs += 60*Integer.parseInt(splitTime[1]);	// Minutes
-
 			/* To figure out seconds to spare, get current seconds since midnight, and add how
 			 * long Google says it'll take to get to the station.  Subtract from that secs since midnight
 			 * that the train will depart at, and there you go.
@@ -233,6 +225,17 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 			cal.set(Calendar.MINUTE, 0);
 			cal.set(Calendar.SECOND, 0);
 			cal.set(Calendar.MILLISECOND, 0);
+
+			/* Get departure time of train, in secs since midnight */
+			time = time.trim();
+			String splitTime[] = time.split(":|[AP]");	// Split time into hours and minutes. Time format is HH:MM[A|P]M
+			secs = 3600*Integer.parseInt(splitTime[0]);	// Hours
+			if (time.charAt(time.length()-2) == 'P' && Integer.parseInt(splitTime[0]) != 12)
+				secs += 12*3600;						// PM, add seconds for first 12 hours of the day
+			else if (time.charAt(time.length()-2) == 'A' && (now/1000) > 12*3600)	// If it's after 12PM, assume any "AM" departure...
+				secs += 24*3600;						//  times are for the "next day", so add seconds for previous 24 hours
+
+			secs += 60*Integer.parseInt(splitTime[1]);	// Minutes
 
 			return (secs - (((now - cal.getTimeInMillis())/1000) + secsToStation));
 		}
