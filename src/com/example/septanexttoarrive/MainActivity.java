@@ -62,7 +62,12 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 		public View getView(int position, View convertView, ViewGroup parent) {
 			LinearLayout layout = (LinearLayout) super.getView(position, convertView, parent);
 
-			long secsToSpare = getSecsToSpare(((TextView)(layout.getChildAt(1))).getText().toString());
+			long secsToSpare;
+			String timeLabel = ((TextView)(layout.getChildAt(1))).getText().toString();	// full label, including delay
+			if (timeLabel.contains("delay"))
+				secsToSpare = getSecsToSpare(timeLabel.split(" ")[0], timeLabel.split(" ")[1].substring(2));
+			else
+				secsToSpare = getSecsToSpare(timeLabel, "");
 
 			if (secsToSpare < 2*60) {			// Under 2 minutes to spare, good chance of missing train
 				((TextView)(layout.getChildAt(0))).setTextColor(getResources().getColor(R.color.lowChanceColor));
@@ -81,7 +86,7 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 		/* Calculates with how many seconds to spare the user will have when they arrive at the station.  The time parameter
 		 * is what time the train departs the station.
 		 */
-		private	long getSecsToSpare(String time) {
+		private	long getSecsToSpare(String departureTime, String delay) {
 			long secs = 0;
 
 			/* To figure out seconds to spare, get current seconds since midnight, and add how
@@ -97,15 +102,18 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 			cal.set(Calendar.MILLISECOND, 0);
 
 			/* Get departure time of train, in secs since midnight */
-			time = time.trim();
-			String splitTime[] = time.split(":|[AP]");	// Split time into hours and minutes. Time format is HH:MM[A|P]M
+			departureTime = departureTime.trim();
+			String splitTime[] = departureTime.split(":|[AP]");	// Split time into hours and minutes. Time format is HH:MM[A|P]M
 			secs = 3600*Integer.parseInt(splitTime[0]);	// Hours
-			if (time.charAt(time.length()-2) == 'P' && Integer.parseInt(splitTime[0]) != 12)
+			if (departureTime.charAt(departureTime.length()-2) == 'P' && Integer.parseInt(splitTime[0]) != 12)
 				secs += 12*3600;						// PM, add seconds for first 12 hours of the day
-			else if (time.charAt(time.length()-2) == 'A' && (now/1000) > 12*3600)	// If it's after 12PM, assume any "AM" departure...
+			else if (departureTime.charAt(departureTime.length()-2) == 'A' && ((now-cal.getTimeInMillis())/1000) > 12*3600)	// If it's after 12PM, assume any "AM" departure...
 				secs += 24*3600;						//  times are for the "next day", so add seconds for previous 24 hours
 
 			secs += 60*Integer.parseInt(splitTime[1]);	// Minutes
+
+			if (!(delay.equals("")))
+					secs += 60*Integer.parseInt(delay);
 
 			return (secs - (((now - cal.getTimeInMillis())/1000) + secsToStation));
 		}
@@ -199,7 +207,13 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 				JSONObject train = (JSONObject)trainArray.get(i);
 				resultsMap = new HashMap<String, String>();
 				resultsMap.put("train", train.getString("orig_line"));
-				resultsMap.put("departure time", train.getString("orig_departure_time"));
+				if (!(train.getString("orig_delay").equals("On time"))) {
+					resultsMap.put("departure time", train.getString("orig_departure_time")
+							+ " (+" + train.getString("orig_delay") + " delay)");
+				}
+				else
+					resultsMap.put("departure time", train.getString("orig_departure_time"));
+
 				resultsList.add(resultsMap);
 			}
 		} catch (Exception e) { Log.e("Exception!", e.toString()); }
