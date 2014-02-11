@@ -64,8 +64,9 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 
 			long secsToSpare;
 			String timeLabel = ((TextView)(layout.getChildAt(1))).getText().toString();	// full label, including delay
+
 			if (timeLabel.contains("delay"))
-				secsToSpare = getSecsToSpare(timeLabel.split(" ")[0], timeLabel.split(" ")[1].substring(2));
+				secsToSpare = getSecsToSpare(timeLabel.split("\\+")[0], (timeLabel.split("\\+")[1]).split(" ")[0]);
 			else
 				secsToSpare = getSecsToSpare(timeLabel, "");
 
@@ -104,10 +105,11 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 			/* Get departure time of train, in secs since midnight */
 			departureTime = departureTime.trim();
 			String splitTime[] = departureTime.split(":|[AP]");	// Split time into hours and minutes. Time format is HH:MM[A|P]M
+
 			secs = 3600*Integer.parseInt(splitTime[0]);	// Hours
-			if (departureTime.charAt(departureTime.length()-2) == 'P' && Integer.parseInt(splitTime[0]) != 12)
+			if (departureTime.contains("PM") && Integer.parseInt(splitTime[0]) != 12)
 				secs += 12*3600;						// PM, add seconds for first 12 hours of the day
-			else if (departureTime.charAt(departureTime.length()-2) == 'A' && ((now-cal.getTimeInMillis())/1000) > 12*3600)	// If it's after 12PM, assume any "AM" departure...
+			else if (departureTime.contains("AM") && ((now-cal.getTimeInMillis())/1000) > 12*3600)	// If it's after 12PM, assume any "AM" departure...
 				secs += 24*3600;						//  times are for the "next day", so add seconds for previous 24 hours
 
 			secs += 60*Integer.parseInt(splitTime[1]);	// Minutes
