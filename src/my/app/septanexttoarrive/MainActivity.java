@@ -1,4 +1,4 @@
-package com.example.septanexttoarrive;
+package my.app.septanexttoarrive;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,6 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -60,8 +61,8 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			LinearLayout layout = (LinearLayout) super.getView(position, convertView, parent);
-
+			RelativeLayout layout = (RelativeLayout) super.getView(position, convertView, parent);
+			
 			long secsToSpare;
 			String timeLabel = ((TextView)(layout.getChildAt(1))).getText().toString();	// full label, including delay
 
@@ -140,6 +141,7 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 		toTextView = (AutoCompleteTextView) findViewById(R.id.toTextField);
 
 		loadStationsMap();
+		
 		/* For autocomplete in the to/from station text fields */
 		ArrayAdapter<String> stationsAdapter = 
 				new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
@@ -188,7 +190,7 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 
 	private String buildSEPTAReq(String fromStation, String toStation) {
 		return "http://www3.septa.org/hackathon/NextToArrive/" + fromStation.replace(" ", "%20") + "/"
-				+ toStation.replace(" ", "%20") + "/10";
+				+ toStation.replace(" ", "%20") + "/8";
 	}
 
 	protected ArrayList<HashMap<String, String>> doSEPTAReq(String fromStation, String toStation) {
@@ -201,7 +203,7 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 		} catch (Exception e) { Log.e("Exception", e.toString()); }
 
 		JSONArray trainArray = null;
-
+		
 		try {
 			/* See e.g. www3.septa.org/hackathon/NextToArrive/Doylestown/Suburban%20Station/10 for sample results */
 			trainArray = new JSONArray(reqRes);
@@ -232,7 +234,7 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 	private String doMapsReq(Location currentLoc, String destLoc, String transportMode) {
 		String reqRes = null;
 		String timeValue = null;
-
+		
 		try {
 			reqRes = new WebRequest().execute(buildMapsReq(currentLoc, destLoc, transportMode)).get();
 		} catch (Exception e) { Log.e("Exception", e.toString()); }
@@ -299,7 +301,7 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 				resultsListAdapter.notifyDataSetChanged();
 		}
 	}
-
+	
 	/* If somehow there's nothing selected by the spinner, default to walking to the station */
 	public void onNothingSelected(AdapterView<?> parent) {
 		transportMode = "walking";
@@ -307,10 +309,10 @@ public class MainActivity extends Activity implements LocationListener, OnItemSe
 
 	public void onLocationChanged(Location location) {
 		currentLoc = location;
-		locUpdatesReceived++;
-		if (locUpdatesReceived > 3) {	// Assume that after a few updates, we have a pretty good location
-			locManager.removeUpdates(this);
-		}
+		//locUpdatesReceived++;
+		//if (locUpdatesReceived > 3) {	// Assume that after a few updates, we have a pretty good location
+		//	locManager.removeUpdates(this);
+		//}
 	}
 
 	/* Needed for LocationListener */

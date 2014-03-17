@@ -1,4 +1,4 @@
-package com.example.septanexttoarrive;
+package my.app.septanexttoarrive;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -25,7 +25,7 @@ class WebRequest extends AsyncTask<String, Void, String> {
 			httpGet = new HttpGet(request[0]);
 			httpGet.setHeader("Content-type", "application/json");
 			
-			Log.v("Req:", request[0]);
+			//Log.v("Req:", request[0]);
 
 			HttpResponse response = httpClient.execute(httpGet);
 			HttpEntity entity = response.getEntity();
@@ -45,7 +45,7 @@ class WebRequest extends AsyncTask<String, Void, String> {
 		try {
 			inputStream.close();
 		} catch (Exception e) { Log.e("Exception!", e.toString()); }
-
+		
 		return result;
 	}
 

@@ -22,35 +22,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/fromTextField"
+        android:layout_alignParentRight="true"
         android:layout_below="@+id/fromTextField"
-        android:inputType="text"
+        android:ems="10"
         android:imeOptions="actionSearch"
-        android:ems="10" />
-
-    <TextView
-        android:id="@+id/toLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/toTextField"
-        android:layout_alignBottom="@+id/toTextField"
-        android:layout_alignRight="@+id/fromLabel"
-        android:text="To" />
-
-    <TextView
-        android:id="@+id/fromLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/fromTextField"
-        android:layout_alignBottom="@+id/fromTextField"
-        android:layout_alignParentLeft="true"
-        android:text="From" />
+        android:inputType="text" />
 
     <AutoCompleteTextView
         android:id="@+id/fromTextField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/fromLabel"
+        android:layout_toRightOf="@+id/textView1"
         android:ems="10"
         android:imeOptions="actionNext"
         android:inputType="text" />
@@ -61,7 +45,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignTop="@+id/tableRow1" >
-
     </ListView>
 
     <Spinner
@@ -69,24 +52,45 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/toTextField"
-        android:layout_toRightOf="@+id/transportationTimeLabel" />
+        android:layout_toRightOf="@+id/textView3" />
 
     <TextView
-        android:id="@+id/transportationTimeLabel"
+        android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/resultsListView"
-        android:layout_alignTop="@+id/transportationMethod"
-        android:layout_marginTop="10dp"
-        android:text="Time to station if " />
+        android:layout_above="@+id/toTextField"
+        android:layout_alignParentLeft="true"
+        android:text="From"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/resultsListView"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="14dp"
+        android:text="Time to station if"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/toTextField"
+        android:layout_toLeftOf="@+id/toTextField"
+        android:text="To"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
         android:id="@+id/transportationTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/transportationTimeLabel"
-        android:layout_alignBottom="@+id/transportationTimeLabel"
         android:layout_toRightOf="@+id/transportationMethod"
-        android:text="" />
+        android:layout_alignBottom="@+id/textView3"
+        android:layout_marginLeft="2dp"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>
+<!-- android:layout_alignBaseline="@+id/textView3"
+        android:layout_alignBottom="@+id/textView3" -->
